@@ -9,6 +9,7 @@ const widthInBlocks = canvasWidth / blockSize;
 const heightInBlocks = canvasHeight / blockSize;
 
 let framerate = 100;
+let score = 0;
 
 let isGamePaused = false;
 let isGameOver = false;
@@ -155,6 +156,8 @@ class Snake {
   }
 
   eatHeart() {
+    score += 1;
+
     const newHeartPosition = Heart.getRandomPosition();
     if (this.checkSelfCollision(newHeartPosition)) {
       this.eatHeart();
@@ -181,6 +184,14 @@ class GameFunctions {
   static drawBG() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  }
+
+  static drawScore() {
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`Score: ${score}`, 45, 45);
   }
 
   static drawBorderWalls(color, strokeColor) {
@@ -230,6 +241,7 @@ function gameLoop() {
   snake.move();
   snake.draw();
   heart.draw();
+  GameFunctions.drawScore();
   GameFunctions.drawBorderWalls('red');
   setTimeout(gameLoop, framerate);
 }
