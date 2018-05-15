@@ -26,6 +26,10 @@ class Block {
     ctx.strokeStyle = this.strokeColor;
     ctx.strokeRect(x, y, blockSize, blockSize);
   }
+
+  checkPosition(otherBlock) {
+    return this.posX === otherBlock.posX && this.posY === otherBlock.posY;
+  }
 }
 
 class Wall {
