@@ -59,14 +59,41 @@ class Wall {
   }
 }
 
+class Heart extends Block {
+  draw() {
+    const x = (this.posX * blockSize) + (blockSize / 10);
+    const y = (this.posY * blockSize) - (blockSize / 10);
+    ctx.fillStyle = this.color;
+    ctx.font = `${blockSize * 1.2}px Arial`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('♥', x, y);
+  }
+
+  static getRandomPosition() {
+    const positionObj = {};
+
+    positionObj.posX = Math.floor(Math.random() * (widthInBlocks - 2)) + 1;
+    positionObj.posY = Math.floor(Math.random() * (heightInBlocks - 2)) + 1;
+
+    return positionObj;
+  }
+
+  move(obj) {
+    this.posX = obj.posX;
+    this.posY = obj.posY;
+  }
+}
+
 class Snake {
-  constructor(startPosX, startPosY, length, snakeColor, snakeStrokeColor) {
+  constructor(startPosX, startPosY, length, snakeColor, snakeStrokeColor, heartObj) {
     this.segments = [];
 
     for (let i = length; i > 0; i--) {
       this.segments.push(new Block(startPosX + i, startPosY, snakeColor, snakeStrokeColor));
     }
 
+    this.heart = heartObj;
     this.color = snakeColor;
     this.direction = 'right';
     this.nextDirection = 'right';
@@ -120,8 +147,20 @@ class Snake {
 
     this.segments.unshift(newHead);
 
-    // here will be apple eating code
-    this.segments.pop();
+    if (newHead.checkPosition(this.heart)) {
+      this.eatHeart();
+    } else {
+      this.segments.pop();
+    }
+  }
+
+  eatHeart() {
+    const newHeartPosition = Heart.getRandomPosition();
+    if (this.checkSelfCollision(newHeartPosition)) {
+      this.eatHeart();
+    } else {
+      this.heart.move(newHeartPosition);
+    }
   }
 
   checkSelfCollision(obj) {
@@ -177,7 +216,8 @@ class GameFunctions {
   }
 }
 
-const snake = new Snake(5, 5, 10, 'darkgreen');
+const heart = new Heart(15, 15, 'red');
+const snake = new Snake(5, 5, 10, 'darkgreen', 'white', heart);
 
 function gameLoop() {
   if (isGamePaused) return;
@@ -189,6 +229,7 @@ function gameLoop() {
   GameFunctions.drawBG();
   snake.move();
   snake.draw();
+  heart.draw();
   GameFunctions.drawBorderWalls('red');
   setTimeout(gameLoop, framerate);
 }
