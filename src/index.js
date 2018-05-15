@@ -86,6 +86,66 @@ class Heart extends Block {
   }
 }
 
+class GameFunctions {
+  static drawBG() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  }
+
+  static drawScore() {
+    ctx.fillStyle = 'white';
+    ctx.font = '20px OptimusPrinceps';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`Score: ${score}`, 45, 45);
+  }
+
+  static drawBorderWalls(color, strokeColor) {
+    const wall = new Wall();
+    wall.draw('horizontal', 0, 1, widthInBlocks, color, strokeColor);
+    wall.draw('vertical', widthInBlocks - 1, 1, heightInBlocks, color, strokeColor);
+    wall.draw('horizontal', heightInBlocks - 1, 0, widthInBlocks - 1, color, strokeColor);
+    wall.draw('vertical', 0, 0, heightInBlocks - 1, color, strokeColor);
+  }
+
+  static displayMiddleScreenMsg(header, msg, headerColor = 'red', msgColor = 'white') {
+    ctx.fillStyle = headerColor;
+    ctx.font = '60px OptimusPrinceps';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(header, canvasWidth / 2, canvasHeight / 2);
+    ctx.fillStyle = msgColor;
+    ctx.font = '20px OptimusPrinceps';
+    ctx.fillText(msg, canvasWidth / 2, (canvasHeight / 2) + 50);
+  }
+
+  static pauseOrRestart(gameFn) {
+    if (isGameOver) {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      window.location.reload();
+    } else if (!isGamePaused) {
+      isGamePaused = true;
+      GameFunctions.displayMiddleScreenMsg('Game Paused', 'Press Space to resume');
+    } else {
+      isGamePaused = false;
+      gameFn();
+    }
+  }
+
+  static setFramerate(gameScore, gameFramerate) {
+    if (gameFramerate < 61) {
+      return gameFramerate;
+    }
+    if (score < 25) {
+      return gameFramerate - 2;
+    } else if (score > 25) {
+      return gameFramerate - 1;
+    }
+
+    return gameFramerate;
+  }
+}
+
 class Snake {
   constructor(startPosX, startPosY, length, snakeColor, snakeStrokeColor, heartObj) {
     this.segments = [];
@@ -182,66 +242,6 @@ class Snake {
   }
 }
 
-class GameFunctions {
-  static drawBG() {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-  }
-
-  static drawScore() {
-    ctx.fillStyle = 'white';
-    ctx.font = '20px OptimusPrinceps';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`Score: ${score}`, 45, 45);
-  }
-
-  static drawBorderWalls(color, strokeColor) {
-    const wall = new Wall();
-    wall.draw('horizontal', 0, 1, widthInBlocks, color, strokeColor);
-    wall.draw('vertical', widthInBlocks - 1, 1, heightInBlocks, color, strokeColor);
-    wall.draw('horizontal', heightInBlocks - 1, 0, widthInBlocks - 1, color, strokeColor);
-    wall.draw('vertical', 0, 0, heightInBlocks - 1, color, strokeColor);
-  }
-
-  static displayMiddleScreenMsg(header, msg, headerColor = 'red', msgColor = 'white') {
-    ctx.fillStyle = headerColor;
-    ctx.font = '60px OptimusPrinceps';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(header, canvasWidth / 2, canvasHeight / 2);
-    ctx.fillStyle = msgColor;
-    ctx.font = '20px OptimusPrinceps';
-    ctx.fillText(msg, canvasWidth / 2, (canvasHeight / 2) + 50);
-  }
-
-  static pauseOrRestart(gameFn) {
-    if (isGameOver) {
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      window.location.reload();
-    } else if (!isGamePaused) {
-      isGamePaused = true;
-      GameFunctions.displayMiddleScreenMsg('Game Paused', 'Press Space to resume');
-    } else {
-      isGamePaused = false;
-      gameFn();
-    }
-  }
-
-  static setFramerate(gameScore, gameFramerate) {
-    if (gameFramerate < 61) {
-      return gameFramerate;
-    }
-    if (score < 25) {
-      return gameFramerate - 2;
-    } else if (score > 25) {
-      return gameFramerate - 1;
-    }
-
-    return gameFramerate;
-  }
-}
-
 class LeaderBoard {
   constructor(startData, lskey) {
     this.leaderBoardData = startData;
@@ -294,7 +294,6 @@ class LeaderBoard {
     });
   }
 }
-
 
 const heart = new Heart(15, 15, 'red');
 const snake = new Snake(5, 5, 3, 'darkgreen', 'white', heart);
