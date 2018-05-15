@@ -10,6 +10,9 @@ const heightInBlocks = canvasHeight / blockSize;
 
 let framerate = 100;
 
+let isGamePaused = false;
+let isGameOver = false;
+
 class Block {
   constructor(posX, posY, color, strokeColor = 'lightgray') {
     this.posX = posX;
@@ -112,7 +115,7 @@ class Snake {
 
     // collision check
     if (this.checkSelfCollision(newHead) || Snake.checkWallCollision(newHead)) {
-      window.location.reload();
+      isGameOver = true;
     }
 
     this.segments.unshift(newHead);
@@ -148,11 +151,40 @@ class GameFunctions {
     wall.draw('horizontal', heightInBlocks - 1, 0, widthInBlocks - 1, color, strokeColor);
     wall.draw('vertical', 0, 0, heightInBlocks - 1, color, strokeColor);
   }
+
+  static displayMiddleScreenMsg(header, msg, headerColor = 'red', msgColor = 'white') {
+    ctx.fillStyle = headerColor;
+    ctx.font = '60px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(header, canvasWidth / 2, canvasHeight / 2);
+    ctx.fillStyle = msgColor;
+    ctx.font = '20px Arial';
+    ctx.fillText(msg, canvasWidth / 2, (canvasHeight / 2) + 50);
+  }
+
+  static pauseOrRestart(gameFn) {
+    if (isGameOver) {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      window.location.reload();
+    } else if (!isGamePaused) {
+      isGamePaused = true;
+      GameFunctions.displayMiddleScreenMsg('Game Paused', 'Press Space to resume');
+    } else {
+      isGamePaused = false;
+      gameFn();
+    }
+  }
 }
 
 const snake = new Snake(5, 5, 10, 'darkgreen');
 
 function gameLoop() {
+  if (isGamePaused) return;
+  if (isGameOver) {
+    GameFunctions.displayMiddleScreenMsg('You Died', 'Press Space to restart');
+    return;
+  }
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   GameFunctions.drawBG();
   snake.move();
@@ -176,6 +208,10 @@ function handleKeys(e) {
 
   if (newDirection !== undefined) {
     snake.setDirection(newDirection);
+  }
+
+  if (e.keyCode === 32) {
+    GameFunctions.pauseOrRestart(gameLoop);
   }
 }
 
