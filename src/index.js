@@ -65,7 +65,7 @@ class Heart extends Block {
     const x = (this.posX * blockSize) + (blockSize / 10);
     const y = (this.posY * blockSize) - (blockSize / 10);
     ctx.fillStyle = this.color;
-    ctx.font = `${blockSize * 1.2}px Arial`;
+    ctx.font = `${blockSize * 1.2}px OptimusPrinceps`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('♥', x, y);
@@ -188,7 +188,7 @@ class GameFunctions {
 
   static drawScore() {
     ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
+    ctx.font = '20px OptimusPrinceps';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(`Score: ${score}`, 45, 45);
@@ -204,12 +204,12 @@ class GameFunctions {
 
   static displayMiddleScreenMsg(header, msg, headerColor = 'red', msgColor = 'white') {
     ctx.fillStyle = headerColor;
-    ctx.font = '60px Arial';
+    ctx.font = '60px OptimusPrinceps';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(header, canvasWidth / 2, canvasHeight / 2);
     ctx.fillStyle = msgColor;
-    ctx.font = '20px Arial';
+    ctx.font = '20px OptimusPrinceps';
     ctx.fillText(msg, canvasWidth / 2, (canvasHeight / 2) + 50);
   }
 
@@ -246,7 +246,10 @@ function gameLoop() {
   setTimeout(gameLoop, framerate);
 }
 
-gameLoop();
+// loading font, then starting game
+document.fonts.load('10pt "OptimusPrinceps"').then(() => {
+  gameLoop();
+});
 
 // controls
 const directionCodes = {
