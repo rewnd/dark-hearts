@@ -110,10 +110,28 @@ class Snake {
         break;
     }
 
+    // collision check
+    if (this.checkSelfCollision(newHead) || Snake.checkWallCollision(newHead)) {
+      window.location.reload();
+    }
+
     this.segments.unshift(newHead);
 
     // here will be apple eating code
     this.segments.pop();
+  }
+
+  checkSelfCollision(obj) {
+    const selfCollision = this.segments.some(elem => elem.checkPosition(obj));
+
+    return selfCollision;
+  }
+
+  static checkWallCollision(obj) {
+    const wallCollision = obj.posX === 0 || obj.posY === 0 ||
+      obj.posX === widthInBlocks - 1 || obj.posY === heightInBlocks - 1;
+
+    return wallCollision;
   }
 }
 
@@ -132,7 +150,7 @@ class GameFunctions {
   }
 }
 
-const snake = new Snake(5, 5, 3, 'darkgreen');
+const snake = new Snake(5, 5, 10, 'darkgreen');
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
