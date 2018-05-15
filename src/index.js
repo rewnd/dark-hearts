@@ -11,7 +11,7 @@ const heightInBlocks = canvasHeight / blockSize;
 let framerate = 100;
 let score = 0;
 
-let isGamePaused = false;
+let isGamePaused = true;
 let isGameOver = false;
 
 class Block {
@@ -248,7 +248,7 @@ function gameLoop() {
 
 // loading font, then starting game
 document.fonts.load('10pt "OptimusPrinceps"').then(() => {
-  gameLoop();
+  GameFunctions.displayMiddleScreenMsg('Dark Hearts', 'Press Space to start game Edition');
 });
 
 // controls
