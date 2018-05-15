@@ -8,7 +8,7 @@ const blockSize = 20;
 const widthInBlocks = canvasWidth / blockSize;
 const heightInBlocks = canvasHeight / blockSize;
 
-let framerate = 100;
+let framerate = 130;
 let score = 0;
 
 let isGamePaused = true;
@@ -155,9 +155,11 @@ class Snake {
     }
   }
 
+  // TODO: think about moving this to GameFunctions class
   eatHeart() {
     score += 1;
 
+    framerate = GameFunctions.setFramerate(score, framerate);
     const newHeartPosition = Heart.getRandomPosition();
     if (this.checkSelfCollision(newHeartPosition)) {
       this.eatHeart();
@@ -224,6 +226,19 @@ class GameFunctions {
       isGamePaused = false;
       gameFn();
     }
+  }
+
+  static setFramerate(gameScore, gameFramerate) {
+    if (gameFramerate < 61) {
+      return gameFramerate;
+    }
+    if (score < 25) {
+      return gameFramerate - 2;
+    } else if (score > 25) {
+      return gameFramerate - 1;
+    }
+
+    return gameFramerate;
   }
 }
 
