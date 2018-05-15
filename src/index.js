@@ -242,13 +242,70 @@ class GameFunctions {
   }
 }
 
+class LeaderBoard {
+  constructor(startData, lskey) {
+    this.leaderBoardData = startData;
+    this.localStorageKey = lskey;
+  }
+
+  checkLocalStorage() {
+    return localStorage.getItem(this.localStorageKey) !== null;
+  }
+
+  readLocalStorage() {
+    const lsdata = localStorage.getItem(this.localStorageKey);
+    this.leaderBoardData = lsdata.split(',');
+  }
+
+  writeLocalStorage() {
+    localStorage.setItem(this.localStorageKey, this.leaderBoardData);
+  }
+
+  updateLeaderBoard(newScore) {
+    this.leaderBoardData.reverse().some((elem, i) => {
+      if (elem < newScore
+      && +this.leaderBoardData[i + 1] !== newScore
+      && i < this.leaderBoardData.length - 1) {
+        this.leaderBoardData[i] = this.leaderBoardData[i + 1];
+        return false;
+      } else if (elem > newScore && i <= this.leaderBoardData.length - 1) {
+        this.leaderBoardData[i - 1] = newScore;
+      } else if (elem < newScore && i === this.leaderBoardData.length - 1) {
+        this.leaderBoardData[i] = newScore;
+      }
+      this.leaderBoardData.reverse();
+      this.writeLocalStorage();
+      return true;
+    });
+  }
+
+  displayLeaderBoard(baseMargin, stringsMargin, textColor) {
+    ctx.fillStyle = textColor;
+    ctx.font = '16px OptimusPrinceps';
+
+    this.readLocalStorage();
+
+    this.leaderBoardData.forEach((elem, i) => {
+      const margin = (i === 0) ? baseMargin : baseMargin + (stringsMargin * i);
+      // there would be loop, but we have only 3-digit scores here
+      let displayedScore = elem.length < 3 ? `0${elem}` : elem;
+      displayedScore = displayedScore.length < 3 ? `0${displayedScore}` : displayedScore;
+      ctx.fillText(`${i + 1}. ${displayedScore}`, canvasWidth / 2, (canvasHeight / 2) + margin);
+    });
+  }
+}
+
+
 const heart = new Heart(15, 15, 'red');
 const snake = new Snake(5, 5, 10, 'darkgreen', 'white', heart);
+const leaderboard = new LeaderBoard([0, 0, 0], 'dh-game');
 
 function gameLoop() {
   if (isGamePaused) return;
   if (isGameOver) {
     GameFunctions.displayMiddleScreenMsg('You Died', 'Press Space to restart');
+    leaderboard.updateLeaderBoard(score);
+    leaderboard.displayLeaderBoard(100, 25);
     return;
   }
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -263,7 +320,13 @@ function gameLoop() {
 
 // loading font, then starting game
 document.fonts.load('10pt "OptimusPrinceps"').then(() => {
+  if (!leaderboard.checkLocalStorage()) {
+    leaderboard.writeLocalStorage();
+  } else {
+    leaderboard.readLocalStorage();
+  }
   GameFunctions.displayMiddleScreenMsg('Dark Hearts', 'Press Space to start game Edition');
+  leaderboard.displayLeaderBoard(100, 25, 'white');
 });
 
 // controls
